@@ -1,0 +1,8 @@
+# Ignore the entire Fashionpedia training data folder (~3.34GB)
+## Download Fashionpedia data here: https://github.com/cvdfoundation/fashionpedia
+train/
+training/
+train2020.zip
+test/
+testing/
+val_test2020.zip
