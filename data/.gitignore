@@ -6,3 +6,10 @@ train2020.zip
 test/
 testing/
 val_test2020.zip
+
+
+# To retrieve dataset using HuggingFace, use the API
+## https://huggingface.co/datasets/detection-datasets/fashionpedia?row=1
+## curl -X GET \
+##      "https://datasets-server.huggingface.co/rows?dataset=detection-datasets%2Ffashionpedia&config=default&split=train&offset=0&length=100"
+huggingface/

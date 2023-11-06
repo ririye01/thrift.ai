@@ -1,5 +1,8 @@
+# Standard library imports
+import json
 from typing import List, Dict, Any, Union
 
+# Related third-party imports
 import numpy as np
 import requests
 
@@ -38,8 +41,7 @@ class AnnotationsLoader:
         """
         response = requests.get(self._training_annotations_route)
         response.raise_for_status()
-        data = response.json()
-        self._annotations = data["annotations"]
+        self._training_annotations = response.json()
 
 
     @property
@@ -53,5 +55,40 @@ class AnnotationsLoader:
             The loaded annotations data.
         """
         if self._training_annotations is None:
-            self._load_annotations()
-        return self._annotations
+            self._load_training_annotations()
+        return self._training_annotations
+
+
+    def _load_json(self, route: str) -> Dict[str, Any]:
+        """
+        Load JSON data from the specified route.
+        """
+        response = requests.get(route)
+        response.raise_for_status()
+        return response.json()
+
+
+    def get_json_keys(self, route: str) -> List[str]:
+        """
+        Get the top-level keys of the JSON response from the specified route.
+        """
+        json_data = self._load_json(route)
+        return list(json_data.keys())
+
+
+    def get_json_schema(self, route: str, depth: int = 10) -> str:
+        """
+        Get the schema of the JSON response, showing nested keys up to the specified depth,
+        and return it as a pretty-printed string.
+        """
+        def get_schema_recursive(json_obj: Union[Dict, List], current_depth: int) -> Union[Dict[str, Any], str]:
+            if isinstance(json_obj, dict):
+                return {k: get_schema_recursive(v, current_depth - 1) for k, v in json_obj.items()} if current_depth > 0 else '...'
+            elif isinstance(json_obj, list):
+                return [get_schema_recursive(json_obj[0], current_depth - 1)] if json_obj else []
+            else:
+                return type(json_obj).__name__
+
+        json_data = self._load_json(route)
+        schema = get_schema_recursive(json_data, depth)
+        return json.dumps(schema, indent=2)  # Use `json.dumps` to pretty print the schema
